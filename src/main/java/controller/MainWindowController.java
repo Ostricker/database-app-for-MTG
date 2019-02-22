@@ -23,6 +23,7 @@ public class MainWindowController {
   public JFXButton higlightic;
   public JFXButton deleteic;
   public JFXButton exportic;
+
   @FXML private ResourceBundle resources;
 
   @FXML private URL location;
