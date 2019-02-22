@@ -23,7 +23,7 @@
     </column>
     <column id="10" parent="6" name="Card Name">
       <Position>2</Position>
-      <DataType>VARCHAR|0s</DataType>
+      <DataType>STRING|0s</DataType>
       <NotNull>1</NotNull>
     </column>
     <column id="11" parent="6" name="Sell">
@@ -64,7 +64,7 @@
     </column>
     <column id="19" parent="7" name="Card Name">
       <Position>2</Position>
-      <DataType>VARCHAR|0s</DataType>
+      <DataType>STRING|0s</DataType>
       <NotNull>1</NotNull>
     </column>
     <column id="20" parent="7" name="Sell">

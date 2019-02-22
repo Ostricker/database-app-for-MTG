@@ -1,0 +1,67 @@
+package controller;
+
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import model.DataResult;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class SQLiteJDBCDriverConnection {
+
+  public static Connection connect() {
+    Connection conn = null;
+    try {
+      String url = "jdbc:sqlite:src/main/java/database/mainDatabase.db";
+
+      conn = DriverManager.getConnection(url);
+
+      System.out.println("Connection to SQLite has been estabilished");
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return conn;
+  }
+
+  public DataResult getAllData(String tableName) throws SQLException {
+    List<List<Object>> data = new ArrayList<>();
+    List<String> columnNames = new ArrayList<>();
+
+    Statement stmt = connect().createStatement();
+    ResultSet rs = stmt.executeQuery("SELECT * FROM " + tableName);
+
+    int columnCount = rs.getMetaData().getColumnCount();
+    for (int i = 1; i <= columnCount; i++) {
+      columnNames.add(rs.getMetaData().getColumnName(i));
+    }
+
+    while (rs.next()) {
+      List<Object> row = new ArrayList<>();
+      for (int i = 1; i <= columnCount; i++) {
+        row.add(rs.getObject(i));
+      }
+      data.add(row);
+    }
+
+    return new DataResult(columnNames, data);
+  }
+
+  public void populateTableView(TableView<List<Object>> tableView, String tableName) {
+    try {
+      SQLiteJDBCDriverConnection importedCardsDriver = new SQLiteJDBCDriverConnection();
+      DataResult dataIC = importedCardsDriver.getAllData(tableName);
+      for (int i = 0; i < dataIC.getNumColumns(); i++) {
+        TableColumn<List<Object>, Object> column = new TableColumn<>(dataIC.getColumnName(i));
+        int columnIndex = i;
+        column.setCellValueFactory(
+            cellData -> new SimpleObjectProperty<>(cellData.getValue().get(columnIndex)));
+        tableView.getColumns().add(column);
+      }
+      tableView.getItems().setAll(dataIC.getData());
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+}

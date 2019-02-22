@@ -6,7 +6,6 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
@@ -53,29 +52,11 @@
               <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="425.0" prefWidth="636.0">
                      <children>
-                        <TableView fx:id="importedCardsTableView" layoutX="102.0" layoutY="63.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                          <columns>
-                            <TableColumn fx:id="IDic" prefWidth="62.0" text="ID" />
-                            <TableColumn fx:id="cardNameic" minWidth="0.0" prefWidth="181.0" text="Card Name" />
-                              <TableColumn fx:id="sellic" prefWidth="76.0" text="Sell" />
-                              <TableColumn fx:id="buyic" prefWidth="104.0" text="Buy" />
-                              <TableColumn fx:id="haveic" prefWidth="81.0" text="Have" />
-                              <TableColumn fx:id="wantic" prefWidth="131.0" text="Want" />
-                          </columns>
-                        </TableView>
+                        <TableView fx:id="importedCardsTableView" layoutX="102.0" layoutY="63.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
-                  <TableView fx:id="savedCardsTableView" prefHeight="200.0" prefWidth="200.0">
-                     <columns>
-                        <TableColumn fx:id="IDsc" prefWidth="62.0" text="ID" />
-                        <TableColumn fx:id="cardNamesc" minWidth="0.0" prefWidth="181.0" text="Card Name" />
-                        <TableColumn fx:id="sellsc" prefWidth="76.0" text="Sell" />
-                        <TableColumn fx:id="buysc" prefWidth="104.0" text="Buy" />
-                        <TableColumn fx:id="havesc" prefWidth="81.0" text="Have" />
-                        <TableColumn fx:id="wantsc" prefWidth="131.0" text="Want" />
-                     </columns>
-                  </TableView>
+                  <TableView fx:id="savedCardsTableView" prefHeight="200.0" prefWidth="200.0" />
               </items>
             </SplitPane>
             <AnchorPane prefHeight="242.0" prefWidth="1280.0">
