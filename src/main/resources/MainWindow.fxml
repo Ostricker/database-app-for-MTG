@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
@@ -19,6 +20,7 @@
               <menus>
                 <Menu mnemonicParsing="false" text="File">
                   <items>
+                        <MenuItem mnemonicParsing="false" text="Import new CVS" />
                     <MenuItem mnemonicParsing="false" text="Close" />
                   </items>
                 </Menu>
@@ -34,30 +36,71 @@
                 </Menu>
               </menus>
             </MenuBar>
-            <SplitPane dividerPositions="0.5, 0.5" prefHeight="456.0" prefWidth="1280.0">
+            <AnchorPane prefHeight="25.0" prefWidth="1280.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="25.0" prefWidth="630.0" text="Imported cards">
+                     <font>
+                        <Font name="Segoe UI Bold" size="20.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="650.0" prefHeight="25.0" prefWidth="630.0" text="Saved cards">
+                     <font>
+                        <Font name="Segoe UI Bold" size="20.0" />
+                     </font></Label>
+               </children>
+            </AnchorPane>
+            <SplitPane dividerPositions="0.5, 0.5" prefHeight="421.0" prefWidth="1280.0">
               <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="425.0" prefWidth="636.0">
                      <children>
-                        <TableView layoutX="102.0" layoutY="63.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <TableView fx:id="importedCardsTableView" layoutX="102.0" layoutY="63.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <columns>
-                            <TableColumn prefWidth="177.0" text="C1" />
-                            <TableColumn minWidth="0.0" prefWidth="155.0" text="C2" />
+                            <TableColumn fx:id="IDic" prefWidth="62.0" text="ID" />
+                            <TableColumn fx:id="cardNameic" minWidth="0.0" prefWidth="181.0" text="Card Name" />
+                              <TableColumn fx:id="sellic" prefWidth="76.0" text="Sell" />
+                              <TableColumn fx:id="buyic" prefWidth="104.0" text="Buy" />
+                              <TableColumn fx:id="haveic" prefWidth="81.0" text="Have" />
+                              <TableColumn fx:id="wantic" prefWidth="131.0" text="Want" />
                           </columns>
                         </TableView>
                      </children>
                   </AnchorPane>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
-                  <TableView prefHeight="200.0" prefWidth="200.0">
+                  <TableView fx:id="savedCardsTableView" prefHeight="200.0" prefWidth="200.0">
                      <columns>
-                        <TableColumn prefWidth="160.0" text="C1" />
-                        <TableColumn prefWidth="155.0" text="C2" />
+                        <TableColumn fx:id="IDsc" prefWidth="62.0" text="ID" />
+                        <TableColumn fx:id="cardNamesc" minWidth="0.0" prefWidth="181.0" text="Card Name" />
+                        <TableColumn fx:id="sellsc" prefWidth="76.0" text="Sell" />
+                        <TableColumn fx:id="buysc" prefWidth="104.0" text="Buy" />
+                        <TableColumn fx:id="havesc" prefWidth="81.0" text="Have" />
+                        <TableColumn fx:id="wantsc" prefWidth="131.0" text="Want" />
                      </columns>
                   </TableView>
               </items>
             </SplitPane>
             <AnchorPane prefHeight="242.0" prefWidth="1280.0">
                <children>
-                  <JFXButton buttonType="RAISED" layoutX="301.0" layoutY="168.0" prefHeight="45.0" prefWidth="116.0" style="-fx-background-color: #009900;" text="OK" textFill="WHITE">
+                  <JFXButton fx:id="moveic" buttonType="RAISED" layoutX="516.0" layoutY="14.0" onAction="#onMoveImportedCard" prefHeight="25.0" prefWidth="116.0" style="-fx-background-color: #0066ff;" text="Move -&gt;" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe UI Bold" size="18.0" />
+                     </font>
+                  </JFXButton>
+                  <JFXButton fx:id="deletesc" buttonType="RAISED" layoutX="1150.0" layoutY="14.0" onAction="#onDeleteSavedCard" prefHeight="25.0" prefWidth="116.0" style="-fx-background-color: #ff0000;" text="DELETE" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe UI Bold" size="18.0" />
+                     </font>
+                  </JFXButton>
+                  <JFXButton fx:id="higlightic" buttonType="RAISED" layoutX="14.0" layoutY="14.0" onAction="#onHighlightImportedCard" prefHeight="25.0" prefWidth="116.0" style="-fx-background-color: #ffff00;" text="Highlight">
+                     <font>
+                        <Font name="Segoe UI Bold" size="18.0" />
+                     </font>
+                  </JFXButton>
+                  <JFXButton fx:id="deleteic" buttonType="RAISED" layoutX="142.0" layoutY="14.0" onAction="#onDeleteImportedCard" prefHeight="25.0" prefWidth="116.0" style="-fx-background-color: #ff0000;" text="DELETE" textFill="WHITE">
+                     <font>
+                        <Font name="Segoe UI Bold" size="18.0" />
+                     </font>
+                  </JFXButton>
+                  <JFXButton fx:id="exportic" buttonType="RAISED" layoutX="388.0" layoutY="14.0" onAction="#onExportImportedCard" prefHeight="25.0" prefWidth="116.0" style="-fx-background-color: #ffffff;" text="Export">
                      <font>
                         <Font name="Segoe UI Bold" size="18.0" />
                      </font>
