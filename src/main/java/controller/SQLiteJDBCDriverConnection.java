@@ -64,4 +64,27 @@ public class SQLiteJDBCDriverConnection {
       e.printStackTrace();
     }
   }
+
+  public void insertIntoSavedCards(List<Object> list) {
+    String sql =
+        "INSERT INTO savedCards(ID,\"Card Name\",Sell,Buy,Have,Want) VALUES("
+            + list.get(0)
+            + ",\""
+            + list.get(1).toString()
+            + "\","
+            + list.get(2)
+            + ","
+            + list.get(3)
+            + ","
+            + list.get(4)
+            + ","
+            + list.get(5)
+            + ")";
+
+    try (PreparedStatement pstmt = connect().prepareStatement(sql)) {
+      pstmt.executeUpdate();
+    } catch (SQLException e1) {
+      e1.printStackTrace();
+    }
+  }
 }
