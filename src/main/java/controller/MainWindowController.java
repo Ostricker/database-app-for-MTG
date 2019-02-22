@@ -9,7 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
-public class MainWindow {
+public class MainWindowController {
 
     public TableView importedCardsTableView;
     public TableColumn wantic;
@@ -18,6 +18,7 @@ public class MainWindow {
     public TableColumn sellic;
     public TableColumn buyic;
     public TableColumn haveic;
+
     public TableView savedCardsTableView;
     public TableColumn IDsc;
     public TableColumn cardNamesc;
@@ -25,6 +26,7 @@ public class MainWindow {
     public TableColumn buysc;
     public TableColumn havesc;
     public TableColumn wantsc;
+
     public JFXButton moveic;
     public JFXButton deletesc;
     public JFXButton higlightic;
