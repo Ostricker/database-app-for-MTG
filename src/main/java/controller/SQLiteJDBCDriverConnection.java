@@ -1,6 +1,7 @@
 package controller;
 
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import model.DataResult;
@@ -18,7 +19,6 @@ public class SQLiteJDBCDriverConnection {
 
       conn = DriverManager.getConnection(url);
 
-      System.out.println("Connection to database succesfull");
     } catch (SQLException e) {
       e.printStackTrace();
     }
@@ -44,7 +44,6 @@ public class SQLiteJDBCDriverConnection {
       }
       data.add(row);
     }
-
     return new DataResult(columnNames, data);
   }
 
@@ -62,7 +61,6 @@ public class SQLiteJDBCDriverConnection {
       }
       tableView.getItems().setAll(dataIC.getData());
       tableView.sort();
-      System.out.println(tableView + " populated from " + tableName);
     } catch (SQLException e) {
       e.printStackTrace();
     }
@@ -73,7 +71,7 @@ public class SQLiteJDBCDriverConnection {
         "INSERT INTO savedCards(ID,\"Card Name\",Sell,Buy,Have,Want) VALUES("
             + list.get(0)
             + ",\""
-            + list.get(1).toString()
+            + list.get(1)
             + "\","
             + list.get(2)
             + ","
@@ -88,21 +86,58 @@ public class SQLiteJDBCDriverConnection {
       pstmt.executeUpdate();
       System.out.println("INSERT successful");
     } catch (SQLException e1) {
-      System.out.println("INSERT STATEMENT FAILED");
+      Alert alert = new Alert(Alert.AlertType.ERROR);
+      alert.setTitle("Chyba");
+      alert.setContentText(e1.toString());
+      alert.showAndWait();
+      System.out.println(e1);
     }
   }
 
-  public void deleteFromTable(Integer id, String tableName, TableView<List<Object>> tableView) {
-    tableView.getSelectionModel().clearSelection();
-
+  public void deleteFromTable(String tableName, Integer id) {
     String sql = "DELETE FROM " + tableName + " WHERE ID=" + id;
 
     try (PreparedStatement pstmt = connect().prepareStatement(sql)) {
       pstmt.executeUpdate();
       System.out.println("DELETE successful");
     } catch (SQLException e) {
-      System.out.println("DELETE STATEMENT FAILED");
+      System.out.println(e);
     }
-    populateTableView(tableView, tableName);
+  }
+
+  public void deleteFromTable(String tableName) {
+    String sql = "DELETE FROM " + tableName;
+
+    try (PreparedStatement pstmt = connect().prepareStatement(sql)) {
+      pstmt.executeUpdate();
+      System.out.println("DELETE successful");
+    } catch (SQLException e) {
+      System.out.println(e);
+    }
+  }
+
+  public void insertIntoImportedCards(
+      String id, String cardName, String sell, String buy, String have, String want) {
+    String sql =
+        "INSERT INTO importedCards(ID,\"Card Name\",Sell,Buy,Have,Want) VALUES("
+            + id
+            + ",\""
+            + cardName
+            + "\","
+            + sell
+            + ","
+            + buy
+            + ","
+            + have
+            + ","
+            + want
+            + ")";
+
+    try (PreparedStatement pstmt = connect().prepareStatement(sql)) {
+      pstmt.executeUpdate();
+      System.out.println("INSERT successful");
+    } catch (SQLException e1) {
+      System.out.println(e1);
+    }
   }
 }

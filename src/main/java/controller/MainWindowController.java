@@ -9,13 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
-import org.supercsv.cellprocessor.constraint.NotNull;
-import org.supercsv.cellprocessor.constraint.UniqueHashCode;
-import org.supercsv.cellprocessor.ift.CellProcessor;
-import org.supercsv.io.CsvListReader;
-import org.supercsv.io.ICsvBeanReader;
-import org.supercsv.io.ICsvListReader;
-import org.supercsv.prefs.CsvPreference;
+import model.CSV;
 
 public class MainWindowController {
 
@@ -40,39 +34,19 @@ public class MainWindowController {
 
   @FXML
   void initialize() {
-    SQLiteJDBCDriverConnection conn = new SQLiteJDBCDriverConnection();
-    conn.populateTableView(importedCardsTableView, importedCardsTable);
-    conn.populateTableView(savedCardsTableView, savedCardsTable);
-    importedCardsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    savedCardsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    refreshTables();
+    // importedCardsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    // savedCardsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-    importedCardsTableView
-        .getSelectionModel()
-        .selectedItemProperty()
-        .addListener(
-            (obs, oldSelection, newSelection) -> {
-              if (newSelection != null) {
-                selectedImportedCard = importedCardsTableView.getSelectionModel().getSelectedItem();
-              }
-            });
-
-    savedCardsTableView
-        .getSelectionModel()
-        .selectedItemProperty()
-        .addListener(
-            (obs, oldSelection, newSelection) -> {
-              if (newSelection != null) {
-                selectedSavedCard = savedCardsTableView.getSelectionModel().getSelectedItem();
-              }
-            });
+    initializeListeners();
   }
 
   public void onMoveImportedCard(ActionEvent actionEvent) {
-    deleteCall(importedCardsTableView, importedCardsTable);
-
     SQLiteJDBCDriverConnection conn = new SQLiteJDBCDriverConnection();
     conn.insertIntoSavedCards(selectedImportedCard);
-    conn.populateTableView(savedCardsTableView, savedCardsTable);
+
+    deleteCall(importedCardsTableView, importedCardsTable);
+    refreshTables();
   }
 
   public void onDeleteImportedCard(ActionEvent actionEvent) {
@@ -87,33 +61,15 @@ public class MainWindowController {
     deleteCall(savedCardsTableView, savedCardsTable);
   }
 
-  public void onImportCVS(ActionEvent actionEvent) {
+  public void onImportCVS(ActionEvent actionEvent) throws IOException {
     FileChooser fileChooser = new FileChooser();
     File selectedFile = fileChooser.showOpenDialog(null);
 
-    ICsvListReader listReader = null;
     if (selectedFile != null) {
       System.out.println("File selected: " + selectedFile.getName());
-      try {
-        listReader =
-            new CsvListReader(
-                new FileReader(selectedFile.getAbsoluteFile()), CsvPreference.STANDARD_PREFERENCE);
-
-        listReader.getHeader(true);
-
-        while (listReader.read() != null) System.out.println(listReader.read());
-
-      } catch (IOException e) {
-        e.printStackTrace();
-      } finally {
-        if (listReader != null) {
-          try {
-            listReader.close();
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-        }
-      }
+      CSV csv = new CSV();
+      csv.importCSV(selectedFile);
+      refreshTables();
 
     } else {
       System.out.println("File selection cancelled.");
@@ -134,26 +90,47 @@ public class MainWindowController {
     tableView.getItems().remove(selectedItem);
 
     SQLiteJDBCDriverConnection conn = new SQLiteJDBCDriverConnection();
-    conn.deleteFromTable((Integer) selectedItem.get(0), table, tableView);
+    conn.deleteFromTable(table, (Integer) selectedItem.get(0));
+
+    refreshTables();
   }
 
-  public CellProcessor[] getProcessors() {
+  public void refreshTables() {
+    importedCardsTableView.getSelectionModel().clearSelection();
+    savedCardsTableView.getSelectionModel().clearSelection();
 
-    final CellProcessor[] processors =
-        new CellProcessor[] {
-          new UniqueHashCode(),
-          new NotNull(),
-          new NotNull(),
-          new NotNull(),
-          new NotNull(),
-          new NotNull(),
-          new NotNull(),
-          new NotNull(),
-          new NotNull(),
-          new NotNull(),
-          new NotNull()
-        };
+    SQLiteJDBCDriverConnection sql = new SQLiteJDBCDriverConnection();
+    sql.populateTableView(importedCardsTableView, importedCardsTable);
+    sql.populateTableView(savedCardsTableView, savedCardsTable);
+  }
 
-    return processors;
+  public void initializeListeners() {
+    importedCardsTableView
+        .getSelectionModel()
+        .selectedItemProperty()
+        .addListener(
+            (obs, oldSelection, newSelection) -> {
+              if (newSelection != null) {
+                selectedImportedCard = importedCardsTableView.getSelectionModel().getSelectedItem();
+                System.out.println(selectedImportedCard);
+              }
+            });
+
+    savedCardsTableView
+        .getSelectionModel()
+        .selectedItemProperty()
+        .addListener(
+            (obs, oldSelection, newSelection) -> {
+              if (newSelection != null) {
+                selectedSavedCard = savedCardsTableView.getSelectionModel().getSelectedItem();
+              }
+            });
+  }
+
+  public void onDeleteImportedTable(ActionEvent actionEvent) {
+    SQLiteJDBCDriverConnection conn = new SQLiteJDBCDriverConnection();
+    conn.deleteFromTable(importedCardsTable);
+
+    refreshTables();
   }
 }
