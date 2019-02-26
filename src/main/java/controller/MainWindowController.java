@@ -1,15 +1,20 @@
 package controller;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import com.jfoenix.controls.JFXButton;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import model.CSV;
+import model.SQLiteJDBCDriverConnection;
 
 public class MainWindowController {
 
@@ -18,9 +23,11 @@ public class MainWindowController {
 
   public TableView<List<Object>> importedCardsTableView;
   public TableView<List<Object>> savedCardsTableView;
+  ArrayList<TableView<List<Object>>> tableViewArray = new ArrayList<TableView<List<Object>>>();
+  public TableView<List<Object>> selectedTableView;
 
-  public List<Object> selectedImportedCard;
-  public List<Object> selectedSavedCard;
+  private List<Object> selectedImportedCard;
+  private List<Object> selectedSavedCard;
 
   public JFXButton moveic;
   public JFXButton deletesc;
@@ -35,22 +42,42 @@ public class MainWindowController {
   @FXML
   void initialize() {
     refreshTables();
-    // importedCardsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    // savedCardsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+    tableViewArray.add(importedCardsTableView);
+    tableViewArray.add(savedCardsTableView);
 
     initializeListeners();
   }
 
+  // Refreshes both tables on call. Needs optimization in case of bigger tables
+  private void refreshTables() {
+    importedCardsTableView.getSelectionModel().clearSelection();
+    savedCardsTableView.getSelectionModel().clearSelection();
+
+    SQLiteJDBCDriverConnection sql = new SQLiteJDBCDriverConnection();
+    sql.populateTableView(importedCardsTableView, importedCardsTable);
+    sql.populateTableView(savedCardsTableView, savedCardsTable);
+  }
+
   public void onMoveImportedCard(ActionEvent actionEvent) {
     SQLiteJDBCDriverConnection conn = new SQLiteJDBCDriverConnection();
-    conn.insertIntoSavedCards(selectedImportedCard);
+    boolean inserted = conn.insertIntoSavedCards(selectedImportedCard);
 
-    deleteCall(importedCardsTableView, importedCardsTable);
-    refreshTables();
+    if (inserted) {
+      deleteCall(importedCardsTableView, importedCardsTable);
+      refreshTables();
+    }
   }
 
   public void onDeleteImportedCard(ActionEvent actionEvent) {
     deleteCall(importedCardsTableView, importedCardsTable);
+  }
+
+  public void onDeleteImportedTable(ActionEvent actionEvent) {
+    SQLiteJDBCDriverConnection conn = new SQLiteJDBCDriverConnection();
+    conn.deleteFromTable(importedCardsTable);
+
+    refreshTables();
   }
 
   public void onHighlightImportedCard(ActionEvent actionEvent) {}
@@ -59,6 +86,16 @@ public class MainWindowController {
 
   public void onDeleteSavedCard(ActionEvent actionEvent) {
     deleteCall(savedCardsTableView, savedCardsTable);
+  }
+
+  public void deleteCall(TableView<List<Object>> tableView, String table) {
+    List<Object> selectedItem = tableView.getSelectionModel().getSelectedItem();
+    tableView.getItems().remove(selectedItem);
+
+    SQLiteJDBCDriverConnection conn = new SQLiteJDBCDriverConnection();
+    conn.deleteFromTable(table, (Integer) selectedItem.get(0));
+
+    refreshTables();
   }
 
   public void onImportCVS(ActionEvent actionEvent) throws IOException {
@@ -85,26 +122,9 @@ public class MainWindowController {
     alert.showAndWait();
   }
 
-  public void deleteCall(TableView<List<Object>> tableView, String table) {
-    List<Object> selectedItem = tableView.getSelectionModel().getSelectedItem();
-    tableView.getItems().remove(selectedItem);
-
-    SQLiteJDBCDriverConnection conn = new SQLiteJDBCDriverConnection();
-    conn.deleteFromTable(table, (Integer) selectedItem.get(0));
-
-    refreshTables();
-  }
-
-  public void refreshTables() {
-    importedCardsTableView.getSelectionModel().clearSelection();
-    savedCardsTableView.getSelectionModel().clearSelection();
-
-    SQLiteJDBCDriverConnection sql = new SQLiteJDBCDriverConnection();
-    sql.populateTableView(importedCardsTableView, importedCardsTable);
-    sql.populateTableView(savedCardsTableView, savedCardsTable);
-  }
-
   public void initializeListeners() {
+
+    importedCardsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     importedCardsTableView
         .getSelectionModel()
         .selectedItemProperty()
@@ -116,6 +136,7 @@ public class MainWindowController {
               }
             });
 
+    savedCardsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     savedCardsTableView
         .getSelectionModel()
         .selectedItemProperty()
@@ -123,14 +144,8 @@ public class MainWindowController {
             (obs, oldSelection, newSelection) -> {
               if (newSelection != null) {
                 selectedSavedCard = savedCardsTableView.getSelectionModel().getSelectedItem();
+                System.out.println(selectedSavedCard);
               }
             });
-  }
-
-  public void onDeleteImportedTable(ActionEvent actionEvent) {
-    SQLiteJDBCDriverConnection conn = new SQLiteJDBCDriverConnection();
-    conn.deleteFromTable(importedCardsTable);
-
-    refreshTables();
   }
 }

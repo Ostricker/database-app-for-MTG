@@ -1,26 +1,49 @@
 package model;
 
 import com.opencsv.CSVReader;
-import controller.SQLiteJDBCDriverConnection;
-import javafx.scene.control.TableView;
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
+import com.opencsv.bean.HeaderColumnNameTranslateMappingStrategy;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CSV {
 
   public void importCSV(File selectedFile) throws IOException {
-    CSVReader reader = new CSVReader(new FileReader(selectedFile.getAbsoluteFile()), '\t');
-    String[] nextLine;
+    Map<String, String> mapping = new HashMap<String, String>();
+    mapping.put("ID", "ID");
+    mapping.put("Card Name", "CardName");
+    mapping.put("Sell", "Sell");
+    mapping.put("Buy", "Buy");
+    mapping.put("Have", "Have");
+    mapping.put("Want", "Want");
+
+    HeaderColumnNameTranslateMappingStrategy<CSVCardBean> strategy =
+        new HeaderColumnNameTranslateMappingStrategy<CSVCardBean>();
+    strategy.setType(CSVCardBean.class);
+    strategy.setColumnMapping(mapping);
+
+    CSVReader csvReader = null;
+    csvReader = new CSVReader(new FileReader(selectedFile.getAbsoluteFile()), '\t');
+    CsvToBean csvToBean = new CsvToBean();
+
+    List<CSVCardBean> list = csvToBean.parse(strategy, csvReader);
     SQLiteJDBCDriverConnection sql = new SQLiteJDBCDriverConnection();
-    int lineNumber = 0;
-    while ((nextLine = reader.readNext()) != null) {
-      lineNumber++;
+
+    for (CSVCardBean card : list) {
 
       sql.insertIntoImportedCards(
-          nextLine[0], nextLine[1], nextLine[3], nextLine[4], nextLine[5], nextLine[7]);
+          card.getID(),
+          card.getCardName(),
+          card.getSell(),
+          card.getBuy(),
+          card.getHave(),
+          card.getWant());
     }
   }
 }

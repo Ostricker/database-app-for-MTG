@@ -1,10 +1,10 @@
-package controller;
+package model;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import model.DataResult;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,10 +12,13 @@ import java.util.List;
 
 public class SQLiteJDBCDriverConnection {
 
-  public static Connection connect() {
+  private static Connection connect() {
+    String testDatabase = "src/main/java/database/mainDatabase.db";
+    String liveDatabase = "C:/Users/Public/SQLite/mainDatabase.db";
+
     Connection conn = null;
     try {
-      String url = "jdbc:sqlite:src/main/java/database/mainDatabase.db";
+      String url = "jdbc:sqlite:" + testDatabase;
 
       conn = DriverManager.getConnection(url);
 
@@ -25,7 +28,7 @@ public class SQLiteJDBCDriverConnection {
     return conn;
   }
 
-  public DataResult getAllData(String tableName) throws SQLException {
+  private DataResult getAllData(String tableName) throws SQLException {
     List<List<Object>> data = new ArrayList<>();
     List<String> columnNames = new ArrayList<>();
 
@@ -66,7 +69,7 @@ public class SQLiteJDBCDriverConnection {
     }
   }
 
-  public void insertIntoSavedCards(List<Object> list) {
+  public Boolean insertIntoSavedCards(List<Object> list) {
     String sql =
         "INSERT INTO savedCards(ID,\"Card Name\",Sell,Buy,Have,Want) VALUES("
             + list.get(0)
@@ -85,34 +88,14 @@ public class SQLiteJDBCDriverConnection {
     try (PreparedStatement pstmt = connect().prepareStatement(sql)) {
       pstmt.executeUpdate();
       System.out.println("INSERT successful");
+      return true;
     } catch (SQLException e1) {
       Alert alert = new Alert(Alert.AlertType.ERROR);
       alert.setTitle("Chyba");
       alert.setContentText(e1.toString());
       alert.showAndWait();
       System.out.println(e1);
-    }
-  }
-
-  public void deleteFromTable(String tableName, Integer id) {
-    String sql = "DELETE FROM " + tableName + " WHERE ID=" + id;
-
-    try (PreparedStatement pstmt = connect().prepareStatement(sql)) {
-      pstmt.executeUpdate();
-      System.out.println("DELETE successful");
-    } catch (SQLException e) {
-      System.out.println(e);
-    }
-  }
-
-  public void deleteFromTable(String tableName) {
-    String sql = "DELETE FROM " + tableName;
-
-    try (PreparedStatement pstmt = connect().prepareStatement(sql)) {
-      pstmt.executeUpdate();
-      System.out.println("DELETE successful");
-    } catch (SQLException e) {
-      System.out.println(e);
+      return false;
     }
   }
 
@@ -138,6 +121,28 @@ public class SQLiteJDBCDriverConnection {
       System.out.println("INSERT successful");
     } catch (SQLException e1) {
       System.out.println(e1);
+    }
+  }
+
+  public void deleteFromTable(String tableName, Integer id) {
+    String sql = "DELETE FROM " + tableName + " WHERE ID=" + id;
+
+    try (PreparedStatement pstmt = connect().prepareStatement(sql)) {
+      pstmt.executeUpdate();
+      System.out.println("DELETE successful");
+    } catch (SQLException e) {
+      System.out.println(e);
+    }
+  }
+
+  public void deleteFromTable(String tableName) {
+    String sql = "DELETE FROM " + tableName;
+
+    try (PreparedStatement pstmt = connect().prepareStatement(sql)) {
+      pstmt.executeUpdate();
+      System.out.println("DELETE successful");
+    } catch (SQLException e) {
+      System.out.println(e);
     }
   }
 }
